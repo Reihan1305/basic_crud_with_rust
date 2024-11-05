@@ -1,6 +1,8 @@
-mod handler;
-mod model;
-mod schema;
+mod controllers;
+mod models;
+mod schemas;
+mod services;
+
 
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
@@ -50,7 +52,7 @@ async fn main() -> std::io::Result<()> {
             .supports_credentials();
         App::new()
             .app_data(web::Data::new(AppState { db: pool.clone() }))
-            .configure(handler::config)
+            .configure(controllers::post_controller::config)
             .wrap(cors)
             .wrap(Logger::default())
     })
