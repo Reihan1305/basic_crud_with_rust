@@ -5,6 +5,7 @@ use crate::{
 };
 use actix_web::{patch,delete,get,post,web,HttpResponse,Responder};
 use serde_json::json;
+use sqlx::{query_as,query};
 
 #[get("/healthcheck")]
 async fn apihealthcheck()->impl Responder {
@@ -17,7 +18,7 @@ async fn apihealthcheck()->impl Responder {
 pub async fn get_all_post(
     data: web::Data<AppState>,
 ) -> impl Responder {
-    let query_result = sqlx::query_as!(
+    let query_result = query_as!(
         PostModel,
         "SELECT * FROM post order by id"
     )
@@ -47,7 +48,7 @@ async fn create_post(
     body:web::Json<CreatePost>,
     data:web::Data<AppState>
 ) -> impl Responder {
-    let query_result = sqlx::query_as!(
+    let query_result = query_as!(
         PostModel,
         "INSERT INTO post(title,content) values ($1, $2) RETURNING *",
         body.title.to_string(),
@@ -62,7 +63,7 @@ async fn create_post(
                 "post":post
             })});
 
-            return HttpResponse::Ok().json(json!(response_json))
+            return HttpResponse::Created().json(json!(response_json))
         }
         Err(e)=>{
             if e.to_string()
@@ -84,7 +85,7 @@ async fn detail_post(
     data:web::Data<AppState>
 ) -> impl Responder {
     let post_id = path.into_inner();
-    let query_result = sqlx::query_as!(
+    let query_result = query_as!(
         PostModel,
         "SELECT * FROM post WHERE id=$1",post_id
     )
@@ -116,7 +117,7 @@ async fn update_post(
     let post_id = path.into_inner();
 
     // Fetch the existing post first
-    let query_result = sqlx::query_as!(
+    let query_result = query_as!(
         PostModel,
         "SELECT * FROM post WHERE id = $1",
         post_id
@@ -137,7 +138,7 @@ async fn update_post(
     let content = body.content.clone().unwrap_or(existing_post.content);
 
     // Perform the update
-    let update_result = sqlx::query_as!(
+    let update_result = query_as!(
         PostModel,
         "UPDATE post SET title = $1, content = $2 WHERE id = $3 RETURNING *",
         title,
@@ -166,7 +167,7 @@ async fn delete_post(
     data: web::Data<AppState>,
 ) -> impl Responder {
     let post_id = path.into_inner();
-    let rows_affected = sqlx::query!("DELETE FROM post  WHERE id = $1", post_id)
+    let rows_affected = query!("DELETE FROM post  WHERE id = $1", post_id)
         .execute(&data.db)
         .await
         .unwrap()
