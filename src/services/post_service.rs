@@ -55,7 +55,7 @@ pub async fn update_post_services(id:Uuid,data:web::Data<AppState>,update_body:P
 }
 
 pub async fn delete_post_service(id:Uuid,data:web::Data<AppState>) ->String {
-    let delete_query = query!("DELETE FROM post  WHERE id = $1", id)
+    let delete_query = query!("DELETE FROM post WHERE id = $1",id )
     .execute(&data.db)
     .await
     .unwrap()
