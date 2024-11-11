@@ -1,0 +1,36 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE post SET title = $1, content = $2 WHERE id = $3 RETURNING *",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "content",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "98fdcf00f9cfa5d229d91cdd64cac9e113c28626efe287108b3c3312044e96cf"
+}

@@ -4,7 +4,7 @@ import { uuidv4 } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
 
 export default function postTest(){
     //getall api
-    const resGetAll = http.get("http://127.0.0.1:8000/api/post");
+    const resGetAll = http.get("http://api:8080/api/post");
     check(resGetAll,{
         "status is 200 get all":(r)=> r.status === 200,
     })
@@ -19,7 +19,7 @@ export default function postTest(){
     //create api 
     const createPayload = JSON.stringify({title:`${uuidv4()} this is title`, content:`this is content ${uuidv4()}`})
 
-    const resCreate =  http.post("http://127.0.0.1:8000/api/post",createPayload,params)
+    const resCreate =  http.post("http://api:8080/api/post",createPayload,params)
 
     check(resCreate,{
         "status is 201 created":(r)=> r.status === 201
@@ -29,7 +29,7 @@ export default function postTest(){
 
     //get detail
 
-    const getOne = http.get(`http://127.0.0.1:8000/api/post/${postId}`)
+    const getOne = http.get(`http://api:8080/api/post/${postId}`)
 
     check(getOne,{
         "status is 200 get one": (r)=>r.status === 200
@@ -38,14 +38,14 @@ export default function postTest(){
     //update api
     const updatePayload = JSON.stringify({title:`${uuidv4()} updated post title`,content:"updated post content"})
 
-    const resUpdated = http.patch(`http://127.0.0.1:8000/api/post/${postId}`,updatePayload,params)
+    const resUpdated = http.patch(`http://api:8080/api/post/${postId}`,updatePayload,params)
 
     check(resUpdated,{
         "status is 200 updated":(r)=>r.status === 200
     })
 
     //delete api
-    const resDeleted = http.del(`http://127.0.0.1:8000/api/post/${postId}`)
+    const resDeleted = http.del(`http://api:8080/api/post/${postId}`)
 
     check(resDeleted,{
         "status is 200 deleted":(r)=>r.status === 204

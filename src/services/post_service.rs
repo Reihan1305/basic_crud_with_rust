@@ -1,7 +1,7 @@
 use crate::models::post_model::PostModel;
 use crate::schemas::post_schema::PostSchema;
 use crate::AppState;
-use actix_web::{web};
+use actix_web::web;
 use sqlx::{query, query_as, Error};
 use uuid::Uuid;
 

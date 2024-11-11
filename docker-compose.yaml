@@ -2,18 +2,130 @@ services:
   postgres:
     image: postgres:latest
     container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - '6500:5432'
+      - '5000:5432'
     volumes:
-      - progresDB:/data/postgres
+      - progresDB:/var/lib/postgresql/data
     env_file:
       - ./.env
-  pgAdmin:
-    image: dpage/pgadmin4
-    container_name: pgAdmin
+    networks:
+      - localprom
+    restart: always
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin"]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 10s
+
+  migrator:
+    image: rust_crud_basic:1.0.1
+    command: sh -c "sqlx migrate run"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - SQLX_OFFLINE=false
+    env_file:
+      - ./.env
+    networks:
+      - localprom
+    volumes:
+      - ./migrations:/usr/local/bin/migrations
+
+  api:
+    image: rust_crud_basic:1.0.2
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
+    environment:
+      - SQLX_OFFLINE=false
+    env_file:
+      - ./.env
+    networks:
+      - localprom
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./migrations:/usr/local/bin/migrations
+    restart: on-failure
+
+  k6forapi:
+    image: k6forbasiccrud:1.0.0
+    depends_on:
+      - api
+    networks:
+      - localprom
     env_file:
       - ./.env
     ports:
-      - "5050:80"
+      - "5665:5665"
+    restart: on-failure
+
+  prometheus:
+    image: prom/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--web.enable-remote-write-receiver"
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  
+      - prom_data:/prometheus
+    ports:
+      - 9090:9090
+    networks:
+      - localprom
+
+  node-exporter:
+    image: prom/node-exporter
+    ports:
+      - 9100:9100
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+    networks:
+      - localprom
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    ports:
+      - 9187:9187
+    environment:
+      DATA_SOURCE_NAME: "postgresql://admin:password123@postgres:5432/rust_crud_basic?sslmode=disable"
+    networks:
+      - localprom
+
+  grafana:
+    image: grafana/grafana
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin  
+    volumes:
+      - grafana_data:/var/lib/grafana  
+    depends_on:
+      - prometheus
+    networks:
+      - localprom
+
 volumes:
   progresDB:
+  grafana_data:
+  prom_data:
+
+networks:
+  localprom:
+    driver: bridge
