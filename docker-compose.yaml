@@ -23,7 +23,7 @@ services:
       timeout: 10s
 
   migrator:
-    image: rust_crud_basic:1.0.1
+    image: rust_crud_basic:1.0.2
     command: sh -c "sqlx migrate run"
     depends_on:
       postgres:
@@ -57,13 +57,14 @@ services:
     restart: on-failure
 
   k6forapi:
-    image: k6forbasiccrud:1.0.0
+    image: k6forbasiccrud:1.0.2
+    env_file:
+      - ./.env
     depends_on:
+      - prometheus
       - api
     networks:
       - localprom
-    env_file:
-      - ./.env
     ports:
       - "5665:5665"
     restart: on-failure

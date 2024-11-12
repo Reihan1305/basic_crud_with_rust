@@ -3,7 +3,7 @@ global:
   scrape_timeout: 15s
   
 remote_write:
-  - url: "http://localhost:9090/api/v1/write"
+  - url: "http://0.0.0.0:9090/api/v1/write"
 
 scrape_configs:
   - job_name: 'prometheus'
@@ -16,7 +16,7 @@ scrape_configs:
 
   - job_name: 'k6'
     static_configs:
-      - targets: ['172.21.73.57:5665']
+      - targets: ['k6forapi:5665']
 
   - job_name: postgres-exporter
     static_configs:

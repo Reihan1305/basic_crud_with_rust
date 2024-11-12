@@ -1,32 +1,26 @@
-FROM rust:1.82.0 as build
+FROM rust:1.82.0
 
-# create a new empty shell project
 WORKDIR /basic_crud
 
-# copy over your manifests
+RUN cargo install sqlx-cli
+
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./Cargo.toml ./Cargo.toml
 
-# this build step will cache your dependencies
-# RUN cargo build --release
-# RUN rm src/*.rs
-
-# copy your source tree
+# Salin folder src dan migrations ke dalam image
 COPY ./src ./src
+COPY ./migrations ./migrations
 COPY .sqlx .sqlx
 
-# build for release
 ENV SQLX_OFFLINE=true
+
+# Hapus file build lama
 RUN rm -f ./target/release/basic_crud*
+
+# Bangun proyek Rust
 RUN cargo build --release
 
+# Jalankan migrasi jika file migrasi ada
+# RUN sqlx migrate run
+
 CMD ["/basic_crud/target/release/rust_crud_basic"]
-
-# our final base
-# FROM debian:buster-slim
-
-# # copy the build artifact from the build stage
-# COPY --from=build /basic_crud/target/release/rust_crud_basic .
-
-# # set the startup command to run your binary
-# CMD ["/rust_basic_crud"]
