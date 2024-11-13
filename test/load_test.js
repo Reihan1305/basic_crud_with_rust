@@ -4,8 +4,8 @@ import postTest from "./api/post_test.js";
 
 export const options = {
     // vus means virtual users
-    vus:10,
-    duration:"1m"
+    vus:500,
+    duration:"5m"
 }
 
 export default function(){

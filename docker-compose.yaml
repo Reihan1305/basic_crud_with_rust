@@ -104,7 +104,7 @@ services:
     ports:
       - 9187:9187
     environment:
-      DATA_SOURCE_NAME: "postgresql://admin:password123@postgres:5432/rust_crud_basic?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://admin:password123@postgres:5432/crud?sslmode=disable"
     networks:
       - localprom
 
