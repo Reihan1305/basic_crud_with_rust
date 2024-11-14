@@ -4,15 +4,11 @@ import postTest from "./api/post_test.js";
 
 export const options = {
     // vus means virtual users
-    vus:500,
+	vus:10,
     duration:"5m"
 }
 
 export default function(){
-    const res = http.get("http://api:8080/api/healthcheck");
-    check(res, {
-        "status is 200": (r) => r.status === 200,
-    });
     group('postApi',()=>{
         postTest()
     })

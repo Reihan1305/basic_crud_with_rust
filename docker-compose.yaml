@@ -22,6 +22,23 @@ services:
       start_period: 10s
       timeout: 10s
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.1
+    hostname: cadvisor
+    container_name: cadvisor
+    platform: linux/amd64  
+    volumes:
+        - "/:/rootfs:ro"
+        - "/var/run:/var/run:ro"
+        - "/sys:/sys:ro"
+        - "/var/lib/docker/:/var/lib/docker:ro"
+        - "/dev/disk/:/dev/disk:ro"
+    ports:
+        - "8765:8080"
+    restart: always
+    networks: 
+      - localprom
+
   migrator:
     image: rust_crud_basic:1.0.2
     command: sh -c "sqlx migrate run"
@@ -80,22 +97,6 @@ services:
       - prom_data:/prometheus
     ports:
       - 9090:9090
-    networks:
-      - localprom
-
-  node-exporter:
-    image: prom/node-exporter
-    ports:
-      - 9100:9100
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - "--path.procfs=/host/proc"
-      - "--path.rootfs=/rootfs"
-      - "--path.sysfs=/host/sys"
-      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
     networks:
       - localprom
 

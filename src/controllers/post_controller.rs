@@ -52,7 +52,7 @@ async fn create_post_handlers(
             .contains("duplicate key value violates unique constraint")
                 {
                     return HttpResponse::BadRequest()
-                    .json(serde_json::json!({"status": "fail","message": "Note with that title already exists"}));
+                    .json(serde_json::json!({"status": "fail","message": "Post with that title already exists"}));
                 }
 
                 return HttpResponse::InternalServerError()
