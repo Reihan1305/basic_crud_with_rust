@@ -73,8 +73,21 @@ services:
       - ./migrations:/usr/local/bin/migrations
     restart: on-failure
 
+  # k6forapi:
+  #   image: k6forbasiccrud:1.0.2
+  #   env_file:
+  #     - ./.env
+  #   depends_on:
+  #     - prometheus
+  #     - api
+  #   networks:
+  #     - localprom
+  #   ports:
+  #     - "5665:5665"
+  #   restart: on-failure
+
   k6forapi:
-    image: k6forbasiccrud:1.0.2
+    image: k6cudforbasiccrud:1.0.0
     env_file:
       - ./.env
     depends_on:
@@ -83,8 +96,8 @@ services:
     networks:
       - localprom
     ports:
-      - "5665:5665"
-    restart: on-failure
+    - "5665:5665"
+    restart: on-failure   
 
   prometheus:
     image: prom/prometheus

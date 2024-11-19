@@ -12,7 +12,6 @@ async fn apihealthcheck()->impl Responder {
     HttpResponse::Ok().json(json!({"status":"success","message":message}))
 }
 
-
 #[get("/post")]
 pub async fn get_all_post(
     data: web::Data<AppState>,
@@ -127,7 +126,6 @@ async fn delete_post(
     data: web::Data<AppState>,
 ) -> impl Responder {
     let post_id = path.into_inner();
-
 
     if delete_post_service(post_id, data).await == "not found" {
         let message = format!("Note with ID: {} not found", post_id);

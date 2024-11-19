@@ -3,7 +3,6 @@ mod models;
 mod schemas;
 mod services;
 
-
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
 use actix_web::{http::header, web, App, HttpServer};

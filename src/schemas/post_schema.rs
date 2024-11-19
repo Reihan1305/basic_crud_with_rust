@@ -11,4 +11,3 @@ pub struct UpdatePost{
     pub title:Option<String>,
     pub content:Option<String>
 }
-
