@@ -1,10 +1,10 @@
 global:
-  scrape_interval: 20s
-  scrape_timeout: 15s
-  
+  scrape_interval: 30s   # Increased interval to mitigate over-scraping
+  scrape_timeout: 20s    # Increased timeout for scraping
+
 remote_write:
   - url: "http://0.0.0.0:9090/api/v1/write"
-
+   
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:
@@ -18,7 +18,7 @@ scrape_configs:
     static_configs:
       - targets: ['k6forapi:5665']
         
-  - job_name: postgres-exporter
+  - job_name: 'postgres-exporter'
     static_configs:
       - targets: ["postgres-exporter:9187"]
 
